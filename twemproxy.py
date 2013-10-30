@@ -11,7 +11,7 @@ class NutcrackerServer( object ):
         self.server = '127.0.0.1'
         self.port = '22222'
 
-    # Need Fix
+
     def submit(self, type, instance, value, server=None):
         if server:
             plugin_instance = '%s-%s' % (self.port, server)
@@ -57,7 +57,7 @@ class NutcrackerServer( object ):
                 metric = collectd.Values()
                 metric.plugin = 'twemproxy-%s'%k
                 metric.type_instance = 'client_eof'
-                metric.type = 'tcp_connections'
+                metric.type = 'derive'
                 metric.values = [str(v['client_eof'])]
                 metric.dispatch()                
 
@@ -65,7 +65,7 @@ class NutcrackerServer( object ):
                 metric = collectd.Values()
                 metric.plugin = 'twemproxy-%s'%k
                 metric.type_instance = 'forward_error'
-                metric.type = 'counter'
+                metric.type = 'derive'
                 metric.values = [str(v['forward_error'])]
                 metric.dispatch()
 
@@ -73,15 +73,22 @@ class NutcrackerServer( object ):
                 metric = collectd.Values()
                 metric.plugin = 'twemproxy-%s'%k
                 metric.type_instance = 'client_err'
-                metric.type = 'counter'
+                metric.type = 'derive'
                 metric.values = [str(v['client_err'])]
                 metric.dispatch()
 
                 metric = collectd.Values()
                 metric.plugin = 'twemproxy-%s'%k
                 metric.type_instance = 'fragments'
-                metric.type = 'counter'
+                metric.type = 'derive'
                 metric.values = [str(v['fragments'])]
+                metric.dispatch()
+
+                metric = collectd.Values()
+                metric.plugin = 'twemproxy-%s'%k
+                metric.type_instance = 'server_ejects'
+                metric.type = 'derive'
+                metric.values = [str(v['server_ejects'])]
                 metric.dispatch()
 
                 #---
@@ -90,7 +97,7 @@ class NutcrackerServer( object ):
                         metric = collectd.Values()
                         metric.plugin = 'twemproxy-%s'%k
                         metric.type_instance = '%s-server_err'%bk
-                        metric.type = 'counter'
+                        metric.type = 'derive'
                         metric.values = [str(v[bk]['server_err'])]
                         metric.dispatch()
 
@@ -104,44 +111,51 @@ class NutcrackerServer( object ):
                         metric = collectd.Values()
                         metric.plugin = 'twemproxy-%s'%k
                         metric.type_instance = '%s-response_bytes'%bk
-                        metric.type = 'counter'
+                        metric.type = 'total_bytes'
                         metric.values = [str(v[bk]['response_bytes'])]
                         metric.dispatch()
 
                         metric = collectd.Values()
                         metric.plugin = 'twemproxy-%s'%k
                         metric.type_instance = '%s-in_queue_bytes'%bk
-                        metric.type = 'counter'
+                        metric.type = 'gauge'
                         metric.values = [str(v[bk]['in_queue_bytes'])]
                         metric.dispatch()
 
                         metric = collectd.Values()
                         metric.plugin = 'twemproxy-%s'%k
                         metric.type_instance = '%s-request_bytes'%bk
-                        metric.type = 'counter'
+                        metric.type = 'derive'
                         metric.values = [str(v[bk]['request_bytes'])]
                         metric.dispatch()
 
                         metric = collectd.Values()
                         metric.plugin = 'twemproxy-%s'%k
                         metric.type_instance = '%s-requests'%bk
-                        metric.type = 'counter'
+                        metric.type = 'derive'
                         metric.values = [str(v[bk]['requests'])]
                         metric.dispatch()
 
                         metric = collectd.Values()
                         metric.plugin = 'twemproxy-%s'%k
                         metric.type_instance = '%s-in_queue'%bk
-                        metric.type = 'counter'
+                        metric.type = 'gauge'
                         metric.values = [str(v[bk]['in_queue'])]
                         metric.dispatch()
 
                         metric = collectd.Values()
                         metric.plugin = 'twemproxy-%s'%k
                         metric.type_instance = '%s-server_connections'%bk
-                        metric.type = 'counter'
+                        metric.type = 'gauge'
                         metric.values = [str(v[bk]['server_connections'])]
                         metric.dispatch()
+                        
+                        metric = collectd.Values()
+                        metric.plugin = 'twemproxy-%s'%k
+                        metric.type_instance = '%s-server_timedout'%bk
+                        metric.type = 'derive'
+                        metric.values = [str(v[bk]['server_timedout'])]
+                        metric.dispatch()                        
             except:
                 pass
 
