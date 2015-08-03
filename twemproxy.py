@@ -7,7 +7,7 @@ import json
 from datetime import timedelta
 
 class NutcrackerServer( object ):
-    def __init__(self): 
+    def __init__(self):
         self.server = '127.0.0.1'
         self.port = '22222'
 
@@ -27,7 +27,7 @@ class NutcrackerServer( object ):
         v.dispatch()
 
     def do_twemproxy_status( self ):
-        
+
         conn = socket.create_connection( (self.server, self.port) )
         buf = True
         content = ''
@@ -42,7 +42,7 @@ class NutcrackerServer( object ):
             try:
                 v = self.data[k]
                 # just to prove we are looking at a key for a backend server
-                v['server_ejects'] 
+                v['server_ejects']
 
                 #dispatch([type][, values][, plugin_instance][, type_instance][, plugin][, host][, time][, interval]) -> None.
                 metric = collectd.Values()
@@ -59,7 +59,7 @@ class NutcrackerServer( object ):
                 metric.type_instance = 'client_eof'
                 metric.type = 'derive'
                 metric.values = [str(v['client_eof'])]
-                metric.dispatch()                
+                metric.dispatch()
 
 
                 metric = collectd.Values()
@@ -96,9 +96,30 @@ class NutcrackerServer( object ):
                     if type(v[bk]) is dict:
                         metric = collectd.Values()
                         metric.plugin = 'twemproxy-%s'%k
+                        metric.type_instance = '%s-server_eof'%bk
+                        metric.type = 'derive'
+                        metric.values = [str(v[bk]['server_eof'])]
+                        metric.dispatch()
+
+                        metric = collectd.Values()
+                        metric.plugin = 'twemproxy-%s'%k
                         metric.type_instance = '%s-server_err'%bk
                         metric.type = 'derive'
                         metric.values = [str(v[bk]['server_err'])]
+                        metric.dispatch()
+
+                        metric = collectd.Values()
+                        metric.plugin = 'twemproxy-%s'%k
+                        metric.type_instance = '%s-server_connections'%bk
+                        metric.type = 'gauge'
+                        metric.values = [str(v[bk]['server_connections'])]
+                        metric.dispatch()
+
+                        metric = collectd.Values()
+                        metric.plugin = 'twemproxy-%s'%k
+                        metric.type_instance = '%s-server_timedout'%bk
+                        metric.type = 'derive'
+                        metric.values = [str(v[bk]['server_timedout'])]
                         metric.dispatch()
 
                         metric = collectd.Values()
@@ -124,6 +145,13 @@ class NutcrackerServer( object ):
 
                         metric = collectd.Values()
                         metric.plugin = 'twemproxy-%s'%k
+                        metric.type_instance = '%s-out_queue_bytes'%bk
+                        metric.type = 'gauge'
+                        metric.values = [str(v[bk]['out_queue_bytes'])]
+                        metric.dispatch()
+
+                        metric = collectd.Values()
+                        metric.plugin = 'twemproxy-%s'%k
                         metric.type_instance = '%s-request_bytes'%bk
                         metric.type = 'derive'
                         metric.values = [str(v[bk]['request_bytes'])]
@@ -145,17 +173,10 @@ class NutcrackerServer( object ):
 
                         metric = collectd.Values()
                         metric.plugin = 'twemproxy-%s'%k
-                        metric.type_instance = '%s-server_connections'%bk
+                        metric.type_instance = '%s-out_queue'%bk
                         metric.type = 'gauge'
-                        metric.values = [str(v[bk]['server_connections'])]
+                        metric.values = [str(v[bk]['out_queue'])]
                         metric.dispatch()
-                        
-                        metric = collectd.Values()
-                        metric.plugin = 'twemproxy-%s'%k
-                        metric.type_instance = '%s-server_timedout'%bk
-                        metric.type = 'derive'
-                        metric.values = [str(v[bk]['server_timedout'])]
-                        metric.dispatch()                        
             except:
                 pass
 
